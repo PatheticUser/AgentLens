@@ -1,47 +1,63 @@
-# 󰭻 AgentLens
+# NexusScout
 
-**AI-Powered LLM Discovery Assistant for Agentic AI Workflows**
+**NexusScout** is a premium, terminal-based AI exploration and discovery tool. Built to assist developers and researchers, it bridges the gap between current state-of-the-art models and your specific engineering workflows by conducting live research and synthesizing highly accurate model recommendations.
 
-AgentLens is a terminal-based (TUI) discovery tool for Large Language Models. It specifically evaluates models for autonomous agent architectures, focusing on reasoning, multi-step planning, and tool-calling capabilities.
+![NexusScout TUI](https://img.shields.io/badge/Interface-CLI_TUI-bright_cyan?style=for-the-badge&logoColor=white) 
+![Ollama Support](https://img.shields.io/badge/Engine-Ollama-bright_green?style=for-the-badge&logo=ollama&logoColor=white)
+![Tavily API](https://img.shields.io/badge/Research-Tavily-bright_magenta?style=for-the-badge&logoColor=white)
 
-## 󰀦 Key Features
+---
 
-- **󰅟 Cloud Discovery:** Uses OpenAI's Responses API (with structured outputs) to fetch real-time model recommendations.
-- **󰗀 Local Benchmarks:** Integrates with **Ollama** to verify local capabilities and compare them with cloud SOTA.
-- **󰐋 Dynamic TUI:** built with `rich`, featuring Nerd Font icons, a live dashboard, and card-based model breakdowns.
-- **󰈙 Model Comparison:** Side-by-side analysis of parameters, key features, and native tool-calling support.
+## Features
 
-## 󱐥 Installation
+- **Tavily Research Integration (`tavily_utils.py`)**: Initiates a real-time web scrape to pull SOTA SWEBENCH metrics, price drops, and context window updates before evaluating SOTA agent viability.
+- **Local Analytics Synthesis (`agent_core.py`)**: Discards generic ChatGPT responses by strictly utilizing your local privacy-first Ollama LLM to synthesize data into hard, factual outputs.
+- **Enforced Model Yield**: For every search, NexusScout is prompt-engineered to guarantee at least **7 diverse model recommendations** (from Frontier models to Open-source self-hostable powerhouses), formatted flawlessly.
+- **Premium TUI UI (`theme.py` & `main.py`)**: Uses high-performance rendering from `rich` to provide animated components, dynamic color styling, and exclusive Nerd Font icons in a layout that elegantly supports terminal scrolling output.
 
-1.  **Clone the repository:**
-    ```bash
-    git clone https://github.com/Rameez/AgentLens.git
-    cd AgentLens
-    ```
+---
 
-2.  **Install dependencies using `uv`:**
-    ```bash
-    uv sync
-    ```
+## Installation & Setup
 
-3.  **Configure environment:** Create a `.env` file with your OpenAI API key:
-    ```
-    OPENAI_API_KEY=sk-...
-    OLLAMA_HOST=http://localhost:11434
-    ```
+NexusScout relies on strict dependency management via [`uv`](https://docs.astral.sh/uv/) for maximum startup performance.
 
-## 󰀄 Usage
+### Prerequisites
+1. **Ollama**: Needs to be installed and running a high-capability model locally (e.g., `qwen3.5:cloud` or `llama3-70b`).
+2. **uv**: Recommended python package manager.
+3. **Nerd Font**: You MUST use a [Nerd Font](https://www.nerdfonts.com/) patched font in your terminal for the UI to display icons accurately (e.g., *MesloLGS NF*, *FiraCode Nerd Font*).
 
-Run the TUI application directly:
-```bash
-uv run python main.py
-```
+### Quickstart
 
-## 󱔁 Tech Stack
+1. **Clone & Enter Repository**
+   ```bash
+   git clone https://github.com/YourUsername/NexusScout.git
+   cd NexusScout
+   ```
 
-- **Core Logic:** Python 3.10+
-- **Package Management:** [uv](https://github.com/astral-sh/uv)
-- **TUI Framework:** [rich](https://github.com/Textualize/rich)
-- **Cloud Models:** OpenAI gpt-4o (structured outputs)
-- **Local Models:** Ollama API
-- **Data Handling:** Pandas & Pydantic
+2. **Add API Keys**
+   We utilize automatic key-rotation. Add as many free-tier Tavily keys as you have to ensure uninterrupted research access.
+   Edit the file `tavily_api_keys.json`:
+   ```json
+   [
+     "tvly-YourKey1",
+     "tvly-YourKey2"
+   ]
+   ```
+
+3. **Install Dependencies & Run**
+   Using `uv`, you don't even have to activate the environment manually:
+   ```bash
+   uv run python main.py
+   ```
+
+---
+
+## Basic Usage
+
+1. Start the tool (`uv run python main.py`).
+2. Enter your discovery query, for example: `"Best models for processing multi-step complex system refactoring"`.
+3. Wait for the `Synthesizing Deep Research` progress indicator to finish.
+4. NexusScout will print a beautiful, scrollable dashboard with 7 curated AI models suitable for your exact use case, alongside a table of your existing local library.
+
+---
+*Created by [Rameez]. Proudly open-source.*

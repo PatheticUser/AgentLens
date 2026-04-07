@@ -2,7 +2,9 @@ import json
 import random
 from tavily import TavilyClient
 
-TAVILY_KEYS_PATH = "/home/Rameez/Code/AgentLens/tavily_api_keys.json"
+from pathlib import Path
+
+TAVILY_KEYS_PATH = Path(__file__).parent / "tavily_api_keys.json"
 
 def get_tavily_keys() -> list[str]:
     """Reads keys from the local file."""

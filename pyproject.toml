@@ -1,7 +1,7 @@
 [project]
-name = "agentlens"
+name = "nexusscout"
 version = "0.1.0"
-description = "Add your description here"
+description = "AI-Powered LLM Discovery Assistant"
 readme = "README.md"
 requires-python = ">=3.11.14"
 dependencies = [

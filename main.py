@@ -1,5 +1,5 @@
 """
-AgentLens - AI-Powered LLM Discovery Assistant
+NexusScout - AI-Powered LLM Discovery Assistant
 Enhanced TUI with Rich and Nerd Fonts
 """
 
@@ -363,7 +363,7 @@ def run_cli():
     console.print()
     console.print(Align.center(
         Panel(
-            f"{Icons.QUIT} [bold bright_magenta]Thanks for using AgentLens![/]\n\n"
+            f"{Icons.QUIT} [bold bright_magenta]Thanks for using NexusScout![/]\n\n"
             f"[dim]Happy model hunting! {Icons.SPARKLE}[/]",
             border_style="bright_magenta",
             box=box.ROUNDED,

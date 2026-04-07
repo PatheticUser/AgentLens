@@ -1,5 +1,5 @@
 """
-AgentLens Theme Configuration
+NexusScout Theme Configuration
 Centralized styling, colors, and Nerd Font icons for a cohesive TUI experience.
 """
 
@@ -183,7 +183,7 @@ class Messages:
     RESULTS_HEADER = f"{Icons.GEM} [bold bright_magenta]Agentic Discoveries[/]"
     LOCAL_HEADER = f"{Icons.LOCAL} [bold bright_green]Connected Ollama Model Library[/]"
     NO_RESULTS = f"{Icons.WARNING} No discoveries found. Try a broader query."
-    GOODBYE = f"{Icons.QUIT} [bold bright_magenta]Exiting AgentLens. Goodbye![/]"
+    GOODBYE = f"{Icons.QUIT} [bold bright_magenta]Exiting NexusScout. Goodbye![/]"
     HELP = f"{Icons.BOOK} [bold bright_cyan]Help & Shortcuts[/]"
 
 

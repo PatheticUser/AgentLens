@@ -27,7 +27,7 @@ def get_agentic_models_from_cloud(query: str) -> list[dict]:
 
     # 2. Compile system prompt with research data
     system_prompt = (
-        "You are 'AgentLens', a Senior AI Research & Discovery Engineer. "
+        "You are 'NexusScout', a Senior AI Research & Discovery Engineer. "
         "Your task is to perform an exhaustive evaluation of models for the user's specific query. "
         "Use the provided Research Context for latest benchmarks and pricing. "
         "CRITICAL REQUIREMENT: You MUST recommend EXACTLY 7 distinct models. NOT 1, NOT 3, but EXACTLY 7. "

@@ -10,7 +10,7 @@ class Settings(BaseSettings):
     OLLAMA_HOST: str = os.getenv("OLLAMA_HOST", "http://localhost:11434")
     
     # UI Constants
-    APP_TITLE: str = "AgentLens"
+    APP_TITLE: str = "NexusScout"
     APP_TAGLINE: str = "AI-Powered LLM Discovery Assistant"
     APP_DESCRIPTION: str = "An end-to-end engineering project designed to help developers and researchers navigate the rapidly evolving landscape of Large Language Models (LLMs)."
 
