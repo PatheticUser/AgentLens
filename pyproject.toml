@@ -9,8 +9,10 @@ dependencies = [
     "openai>=2.30.0",
     "pandas>=3.0.2",
     "pydantic>=2.12.5",
+    "pydantic-settings>=2.13.1",
     "python-dotenv>=1.2.2",
     "requests>=2.33.1",
-    "streamlit>=1.56.0",
+    "rich>=14.3.3",
+    "tavily-python>=0.7.23",
 ]
 

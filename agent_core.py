@@ -1,69 +1,98 @@
 import json
-from openai import OpenAI
+import ollama
 from pydantic import BaseModel, Field
-from config import OPENAI_API_KEY
+from config import OLLAMA_HOST
+from tavily_utils import search_tavily
+from rich.console import Console
+
+console = Console()
 
 class ModelInfo(BaseModel):
     model_name: str = Field(description="Official name and version")
-    description: str = Field(description="1-2 sentence summary of strengths for agentic use")
-    parameters: str = Field(description="Size in billions (e.g., 8B, 70B)")
-    key_features: str = Field(description="Reasoning capabilities, context window, and multimodal support")
-    tool_calling: str = Field(description="Native support for parallel tool execution")
+    description: str = Field(description="Summary of strengths for this specific task")
+    parameters: str = Field(description="Size in billions (e.g., 8B, 70B, etc. or N/A)")
+    key_features: str = Field(description="Key strengths, benchmarks, or reasoning capabilities")
+    tool_calling: str = Field(description="Support for parallel tool or function execution")
 
 class ModelsResponse(BaseModel):
     models: list[ModelInfo]
 
 def get_agentic_models_from_cloud(query: str) -> list[dict]:
     """
-    Calls OpenAI's Chat Completions API using Structured Outputs (Responses API).
-    Uses few-shot prompting to ensure a JSON response matching the structured fields.
+    Performs deep research using Tavily, then compiles a top model recommendation list
+    using the best local Ollama engine (e.g., qwen3.5:cloud).
     """
-    if not OPENAI_API_KEY:
-        return [{"Model Name": "Error", "Description": "OPENAI_API_KEY not set in .env", "Parameters": "N/A", "Key Features": "N/A", "Tool/Function Calling": "N/A"}]
+    # 1. Start Web Research
+    research_context = search_tavily(query)
 
-    client = OpenAI(api_key=OPENAI_API_KEY)
-
+    # 2. Compile system prompt with research data
     system_prompt = (
-        "You are a Senior AI Engineer specializing in autonomous agent architectures. "
-        "Your task is to evaluate and recommend Large Language Models (LLMs) suitable for specific agent use cases. "
-        "Feel free to use available up-to-date knowledge (simulated web search logic) to provide accurate details. "
-        "Return a JSON format matching the requested schema exactly. "
-        "Only recommend models that are highly suitable for the user's specific use case.\n\n"
-        "Few-shot Example:\n"
-        "User: Recommend a model for coding agents.\n"
-        "Output: { \"models\": [ { \"model_name\": \"gpt-4o\", \"description\": \"High-performance multimodal model excellent for coding and reasoning tasks.\", \"parameters\": \"Unknown\", \"key_features\": \"128k context, strong logic, vision capabilities\", \"tool_calling\": \"Excellent parallel tool calling support\" } ] }"
+        "You are 'AgentLens', a Senior AI Research & Discovery Engineer. "
+        "Your task is to perform an exhaustive evaluation of models for the user's specific query. "
+        "Use the provided Research Context for latest benchmarks and pricing. "
+        "CRITICAL REQUIREMENT: You MUST recommend EXACTLY 7 distinct models. NOT 1, NOT 3, but EXACTLY 7. "
+        "Provide a diverse range: include at least 2 frontier models, 3 open-source models, and 2 task-specific niche models. "
+        "\n\n--- RESEARCH CONTEXT ---\n"
+        f"{research_context}\n"
+        "--- END RESEARCH CONTEXT ---\n\n"
+        "Output MUST be a raw JSON object matching this schema exactly. "
+        "Your JSON MUST contain exactly 7 items in the 'models' array:\n"
+        "{\n"
+        "  'models': [\n"
+        "    { 'model_name': '...', 'description': '...', 'parameters': '...', 'key_features': '...', 'tool_calling': '...' },\n"
+        "    { 'model_name': '...', 'description': '...', 'parameters': '...', 'key_features': '...', 'tool_calling': '...' },\n"
+        "    { 'model_name': '...', 'description': '...', 'parameters': '...', 'key_features': '...', 'tool_calling': '...' },\n"
+        "    { 'model_name': '...', 'description': '...', 'parameters': '...', 'key_features': '...', 'tool_calling': '...' },\n"
+        "    { 'model_name': '...', 'description': '...', 'parameters': '...', 'key_features': '...', 'tool_calling': '...' },\n"
+        "    { 'model_name': '...', 'description': '...', 'parameters': '...', 'key_features': '...', 'tool_calling': '...' },\n"
+        "    { 'model_name': '...', 'description': '...', 'parameters': '...', 'key_features': '...', 'tool_calling': '...' }\n"
+        "  ]\n"
+        "}"
     )
 
+    # 3. Choose Local Discovery Engine
     try:
-        completion = client.beta.chat.completions.parse(
-            model="gpt-4o",
+        client = ollama.Client(host=OLLAMA_HOST)
+        models_list = client.list()
+        available_models = models_list.get('models', []) if isinstance(models_list, dict) else models_list.models
+        
+        # Engine choice strategy
+        engine_options = ["qwen3.5:cloud", "deepseek-v3.1:671b-cloud", "nemotron-3-super:cloud"]
+        engine_model = available_models[0].model if not isinstance(available_models[0], dict) else available_models[0]['name']
+        for opt in engine_options:
+            if any((m.model == opt if not isinstance(m, dict) else m['name'] == opt) for m in available_models):
+                engine_model = opt
+                break
+
+        response = client.chat(
+            model=engine_model,
             messages=[
                 {"role": "system", "content": system_prompt},
-                {"role": "user", "content": f"Recommend models for this use case: {query}"}
+                {"role": "user", "content": f"Discover top 7 models for: {query}"}
             ],
-            response_format=ModelsResponse,
+            format="json"
         )
         
-        models_data = completion.choices[0].message.parsed
+        raw_content = response['message']['content']
+        data = json.loads(raw_content)
         
-        # Convert Pydantic model back to a format suitable for the UI
-        result = []
-        for m in models_data.models:
-            result.append({
-                "Model Name": m.model_name,
-                "Description": m.description,
-                "Parameters": m.parameters,
-                "Key Features": m.key_features,
-                "Tool/Function Calling": m.tool_calling
+        # Format the result list for UI component
+        results = []
+        for m in data.get("models", []):
+            results.append({
+                "Model Name": m.get("model_name", "Unknown"),
+                "Description": m.get("description", "Not provided"),
+                "Parameters": m.get("parameters", "N/A"),
+                "Key Features": m.get("key_features", "N/A"),
+                "Tool/Function Calling": m.get("tool_calling", "N/A")
             })
-        return result
-        
+        return results
+
     except Exception as e:
-        print(f"Error calling OpenAI API: {e}")
         return [{
-            "Model Name": "OpenAI Error",
-            "Description": str(e),
-            "Parameters": "N/A",
-            "Key Features": "N/A",
-            "Tool/Function Calling": "N/A"
+            "Model Name": "Discovery Error",
+            "Description": f"Failed to perform research discovery: {str(e)}",
+            "Parameters": "!",
+            "Key Features": "!",
+            "Tool/Function Calling": "!"
         }]
