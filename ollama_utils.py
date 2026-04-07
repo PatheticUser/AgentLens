@@ -1,6 +1,7 @@
 import ollama
 from rich.console import Console
 from config import OLLAMA_HOST
+from theme import Icons, Colors
 
 console = Console()
 
@@ -59,5 +60,5 @@ def is_ollama_running() -> bool:
 def get_ollama_status() -> tuple[bool, str]:
     """Returns connectivity status and a nice string with an icon."""
     if is_ollama_running():
-        return True, "[bold green]●[/] [green]Ollama Connected[/]"
-    return False, "[bold red]○[/] [red]Ollama Offline[/]"
+        return True, f"[bold {Colors.SUCCESS}]{Icons.ONLINE}[/] [{Colors.SUCCESS}]Ollama Connected[/]"
+    return False, f"[bold {Colors.ERROR}]{Icons.OFFLINE}[/] [{Colors.ERROR}]Ollama Offline[/]"
